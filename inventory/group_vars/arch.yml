@@ -1,0 +1,33 @@
+---
+hostname: forgestack-arch
+
+essential_pack:
+  sys_admin_utils:
+    - sudo
+    - curl
+    - wget
+    - htop
+    - unzip
+    - fail2ban
+    - bash-completion
+    - man-db
+    - man-pages
+    - rsync
+  net_utils:
+    - openssh
+    - networkmanager
+    - linux-firmware
+    - intel-ucode
+    - iproute2
+    - avahi
+  editor_utils:
+    - nano
+    - vim
+    - neovim
+    - tmux
+  dev_build_utils:
+    - git
+    - base-devel
+  maintenance_utils:
+    - reflector
+    - ncdu

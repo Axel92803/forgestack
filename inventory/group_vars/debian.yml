@@ -1,0 +1,29 @@
+---
+hostname: forgestack-deb
+
+essential_pack:
+  sys_admin_utils:
+    - sudo
+    - curl
+    - wget
+    - htop
+    - unzip
+    - fail2ban
+    - bash-completion
+  net_utils:
+    - openssh-server
+    - iproute2
+    - tcpdump
+    - nmap
+    - mtr
+  editor_utils:
+    - nano
+    - vim
+    - tmux
+  dev_build_utils:
+    - git
+    - build-essential
+  maintenance_utils:
+    - aptitude
+    - cron
+    - libpam-pwquality
