@@ -1,0 +1,65 @@
+---
+
+- name: create custom groups
+  ansible.builtin.group:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ custom_groups }}"
+
+- name: create users
+  ansible.builtin.user:
+    shell: "{{ default_shell }}"
+    name: "{{ item.username }}"
+    groups: "{{ item.groups }}"
+    append: true
+    state: "{{ item.state }}"
+  loop: "{{ users }}"
+
+- name: deploy SSH authorized keys
+  ansible.posix.authorized_key:
+    user: "{{ item.username }}"
+    key: "{{ item.ssh_key }}"
+    state: present
+  loop: "{{ users }}"
+  when: item.ssh_key | length > 0
+
+- name: configure sudo rules (Debian)
+  ansible.builtin.template:
+    src: sudoers.j2
+    dest: /etc/sudoers.d/forgestack
+    mode: "0440"
+    owner: root
+    group: root
+    validate: /usr/sbin/visudo -cf %s
+
+- name: check sudo log exists
+  ansible.builtin.file:
+    path: "{{ sudo_log_dir }}"
+    state: directory
+    mode: "0750"
+
+- name: configure password policy (login.defs)
+  ansible.builtin.lineinfile:
+    path: /etc/login.defs
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  loop:
+    - {regexp: '^PASS_MAX_DAYS', line: 'PASS_MAX_DAYS {{ pass_max_days }}' }
+    - {regexp: '^PASS_MIN_DAYS', line: 'PASS_MIN_DAYS {{ pass_min_days }}' }
+    - {regexp: '^PASS_WARN_DAYS', line: 'PASS_WARN_DAYS {{ pass_warn_days }}' }
+
+- name: configure password complexity in pam_pwquality (Debian)
+  ansible.builtin.lineinfile:
+    path: /etc/pam.d/common-password
+    regexp: 'pam_pwquality\.so'
+    line: "password requisite pam_pwquality.so retry=3 minlen={{ pass_min_len }} ucredit=-1 lcredit=-1 dcredit=-1 maxrepeat={{ pass_max_repeat }} reject_username difok={{ pass_min_diff }} enforce_for_root"
+  when: ansible_os_family == "Debian"
+
+- name: configure password complexity in pam_pwquality (Arch)
+  ansible.builtin.template:
+    src: pwquality.conf.j2
+    dest: /etc/security/pwquality.conf
+    mode: "0644"
+    owner: root
+    group: root
+  when: ansible_os_family == "Archlinux"
