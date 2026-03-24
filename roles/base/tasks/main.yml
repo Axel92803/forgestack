@@ -1,0 +1,35 @@
+---
+- name: update and upgrade all packages (Debian)
+  ansible.builtin.apt:
+    update_cache: true
+    upgrade: dist
+  when: ansible_os_family == "Debian"
+
+- name: update and upgrade all packages (Arch)
+  community.general.pacman:
+    update_cache: true
+    upgrade: true
+  when: ansible_os_family == "Archlinux"
+
+- name: install essential packages (Debian)
+  ansible.builtin.apt:
+    name: "{{ essential_pack.values() | map('list') | flatten }}"
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: install essential packages (Arch)
+  community.general.pacman:
+    name: "{{ essential_pack.values() | map('list') | flatten }}"
+    state: present
+  when: ansible_os_family == "Archlinux"
+
+
+- name: set hostname
+  ansible.builtin.hostname:
+    name: "{{ hostname }}"
+
+- name: configure time zone
+  community.general.timezone:
+    name: Europe/London
+
+...
