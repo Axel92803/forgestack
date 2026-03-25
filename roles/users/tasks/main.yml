@@ -23,7 +23,7 @@
   loop: "{{ users }}"
   when: item.ssh_key | length > 0
 
-- name: configure sudo rules (Debian)
+- name: configure sudo rules
   ansible.builtin.template:
     src: sudoers.j2
     dest: /etc/sudoers.d/forgestack
@@ -32,11 +32,19 @@
     group: root
     validate: /usr/sbin/visudo -cf %s
 
-- name: check sudo log exists
+- name: Check if sudo log directory exists
+  ansible.builtin.stat:
+    path: "{{ sudo_log_dir }}"
+  register: sudo_log
+
+- name: Create sudo log directory
   ansible.builtin.file:
     path: "{{ sudo_log_dir }}"
     state: directory
     mode: "0750"
+    owner: root
+    group: root
+  when: not sudo_log.stat.exists
 
 - name: configure password policy (login.defs)
   ansible.builtin.lineinfile:
@@ -46,7 +54,7 @@
   loop:
     - {regexp: '^PASS_MAX_DAYS', line: 'PASS_MAX_DAYS {{ pass_max_days }}' }
     - {regexp: '^PASS_MIN_DAYS', line: 'PASS_MIN_DAYS {{ pass_min_days }}' }
-    - {regexp: '^PASS_WARN_DAYS', line: 'PASS_WARN_DAYS {{ pass_warn_days }}' }
+    - {regexp: '^PASS_WARN_AGE', line: 'PASS_WARN_AGE {{ pass_warn_age }}' }
 
 - name: configure password complexity in pam_pwquality (Debian)
   ansible.builtin.lineinfile:
