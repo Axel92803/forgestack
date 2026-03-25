@@ -1,0 +1,8 @@
+# ForgeStack SSH hardening
+# Managed by Ansible — do not edit manually
+
+Port {{ ssh_port }}
+PermitRootLogin no
+PasswordAuthentication no
+MaxAuthTries {{ ssh_max_auth_tries }}
+AllowGroups {{ ssh_allow_groups | join(' ') }}

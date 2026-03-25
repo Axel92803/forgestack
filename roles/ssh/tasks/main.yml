@@ -1,0 +1,26 @@
+---
+- name: Ensure sshd_config.d is included
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?Include /etc/ssh/sshd_config.d/'
+    line: "Include /etc/ssh/sshd_config.d/*.conf"
+    insertbefore: BOF
+  notify: restart sshd
+
+- name: deploy SSH hardening config
+  ansible.builtin.template:
+    src: sshd_hardening.conf.j2
+    dest: /etc/ssh/sshd_config.d/forgestack.conf
+    mode: "0644"
+    owner: root
+    group: root
+
+- name: Validate SSH config
+  ansible.builtin.command: sshd -t
+  changed_when: false
+
+- name: Enable SSH at boot
+  ansible.builtin.service:
+    name: "{{ ssh_service_name }}"
+    enabled: true
+    state: started
