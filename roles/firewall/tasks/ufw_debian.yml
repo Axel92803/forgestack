@@ -1,0 +1,32 @@
+---
+- name: check for UFW pkg and install if not found
+  ansible.builtin.apt:
+    name: "{{ firewall_pkg }}"
+    state: present
+
+- name: reject incoming traffic
+  community.general.ufw:
+    default: deny
+    direction: incoming
+
+- name: allow outgoing traffic
+  community.general.ufw:
+    default: allow
+    direction: outgoing
+
+- name: allow incoming traffic from port 4242
+  community.general.ufw:
+    rule: allow
+    proto: tcp
+    port: "{{ ssh_port }}"
+    src: "{{ ansible_subnet }}"
+    comment: "ForgeStack - SSH access"
+
+- name: Enable UFW
+  community.general.ufw:
+    state: enabled
+
+- name: Enable UFW at boot
+  ansible.builtin.service:
+    name: ufw
+    enabled: true
