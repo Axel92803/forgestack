@@ -1,6 +1,8 @@
 ---
 hostname: forgestack-deb
 
+# Essential packages
+
 essential_pack:
   sys_admin_utils:
     - sudo
@@ -27,3 +29,11 @@ essential_pack:
     - aptitude
     - cron
     - libpam-pwquality
+
+# Firewall
+
+firewall_pkg: ufw
+
+#SSH
+
+ssh_service_name: ssh

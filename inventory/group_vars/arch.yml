@@ -1,6 +1,8 @@
 ---
 hostname: forgestack-arch
 
+# Essential packages
+
 essential_pack:
   sys_admin_utils:
     - sudo
@@ -31,3 +33,11 @@ essential_pack:
   maintenance_utils:
     - reflector
     - ncdu
+
+# Firewall
+
+firewall_pkg: nftables
+
+#SSH
+
+ssh_service_name: sshd

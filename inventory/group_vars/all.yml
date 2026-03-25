@@ -1,7 +1,12 @@
 ---
+
+ansible_admin_user: alex
+
+# SHELL
+
 default_shell: /bin/bash
 
-#USERS
+# USERS
 
 users:
   - username: alex
@@ -25,7 +30,7 @@ users:
     ssh_key: ""
     state: present
 
-#GROUPS
+# GROUPS
 
 custom_groups:
   - sudo
@@ -33,18 +38,30 @@ custom_groups:
   - sshusers
   - logging
 
-#SUDO
+# SUDO
 
 sudo_password_tries: 3
 sudo_badpass_message: "Womp, Womp try again"
 sudo_log_dir: /var/log/sudo
 sudo_require_tty: true
 
-#PASSWORD POLICY
+# PASSWORD POLICY
 
 pass_max_days: 30
 pass_min_days: 2
-pass_warn_days: 7
+pass_warn_age: 7
 pass_min_len: 10
 pass_max_repeat: 3
 pass_min_diff: 7
+
+# SSH HARDENING
+
+ansible_admin: "192.168.50.1"
+ansible_subnet: "192.168.50.0/24"
+icmp_rate_limit: "10/second"
+ssh_port: 4242
+ssh_max_auth_tries: 3
+ssh_allow_groups:
+  - sudo
+  - devops
+  - sshusers
