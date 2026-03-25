@@ -1,13 +1,27 @@
 ---
-- name: update and upgrade all packages (Debian)
+
+- name: Deploy optimised sources.list
+  ansible.builtin.template:
+    src: sources.list.j2
+    dest: /etc/apt/sources.list
+    backup: true
+  when: ansible_os_family == "Debian"
+
+- name: Update and upgrade all packages (Debian)
   ansible.builtin.apt:
     update_cache: true
-    upgrade: dist
+    cache_valid_time: 3600
+    #upgrade: dist
+    #force_apt_get: true
+    #dpkg_options: "force-confold,force-confdef"
+  #environment:
+    #DEBIAN_FRONTEND: noninteractive
   when: ansible_os_family == "Debian"
 
 - name: update and upgrade all packages (Arch)
   community.general.pacman:
     update_cache: true
+    #cache_valid_time: 3600
     upgrade: true
   when: ansible_os_family == "Archlinux"
 
@@ -23,10 +37,31 @@
     state: present
   when: ansible_os_family == "Archlinux"
 
-
-- name: set hostname
+- name: set hostname (Debian)
   ansible.builtin.hostname:
     name: "{{ hostname }}"
+  when: ansible_os_family == "Debian"
+
+- name: Set hostname in /etc/hosts (Debian)
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.0\.1\s+{{ hostname }}'
+    line: "127.0.0.1 {{ hostname }}"
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: set hostname (Arch)
+  ansible.builtin.hostname:
+    name: "{{ hostname }}"
+  when: ansible_os_family == "Archlinux"
+
+- name: Set hostname in /etc/hosts (Arch)
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.0\.1\s+{{ hostname }}'
+    line: "127.0.0.1 {{ hostname }}"
+    state: present
+  when: ansible_os_family == "Archlinux"
 
 - name: configure time zone
   community.general.timezone:
