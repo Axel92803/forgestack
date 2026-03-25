@@ -1,0 +1,8 @@
+---
+- name: install and configure UFW security protocols
+  include_tasks: ufw_debian.yml
+  when: ansible_os_family == "Debian"
+
+- name: install and configure nftables security protocols
+  include_tasks: nftables_arch.yml
+  when: ansible_os_family == "Archlinux"
