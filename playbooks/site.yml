@@ -1,8 +1,11 @@
 ---
 
-- hosts: all
+- name: Deploy Debian and Arch servers
+  hosts: all
   become: true
   become_method: sudo
   roles:
     - base
     - users
+    - ssh
+    - firewall
